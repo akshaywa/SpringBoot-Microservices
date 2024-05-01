@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: Order-Service
+  data:
+    mongodb:
+      uri: mongodb+srv://walunja11:LO56EsJAxpdErHEH@cluster0.tmq9eqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: productdb
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: ${EUREKA_SERVER_ADDRESS:http://localhost:8761/eureka}
+
+server:
+  port: 8082
+
