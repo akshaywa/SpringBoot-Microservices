@@ -8,4 +8,6 @@ public interface ProductService {
     String addProduct(ProductRequest productRequest);
 
     ProductResponse getProductById(String productId);
+
+    void reduceQuantity(String productId, long quantity);
 }
