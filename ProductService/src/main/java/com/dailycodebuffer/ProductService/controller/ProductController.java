@@ -18,7 +18,7 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<String> addProduct(@RequestBody ProductRequest productRequest) {
-        log.info("inside addProduct method in ProductController class. {}", productRequest);
+        log.info("inside addProduct method in ProductController class. {}", productRequest.toString());
         String productId = productService.addProduct(productRequest);
         return new ResponseEntity<>(productId, HttpStatus.OK);
     }

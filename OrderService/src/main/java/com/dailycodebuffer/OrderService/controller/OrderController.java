@@ -20,7 +20,7 @@ public class OrderController {
 
     @PostMapping("/placeOrder")
     public ResponseEntity<String> placeOrder (@RequestBody OrderRequest orderRequest) {
-        log.info("inside placeOrder method in OrderController class. {}",orderRequest);
+        log.info("inside placeOrder method in OrderController class. {}",orderRequest.toString());
         String orderId = orderService.placeOrder(orderRequest);
         return new ResponseEntity<>(orderId, HttpStatus.OK);
     }
