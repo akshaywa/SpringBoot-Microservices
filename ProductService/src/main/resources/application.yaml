@@ -1,6 +1,6 @@
 spring:
   application:
-    name: Product-Service
+    name: PRODUCT-SERVICE
   data:
     mongodb:
       uri: mongodb+srv://walunja11:LO56EsJAxpdErHEH@cluster0.tmq9eqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
