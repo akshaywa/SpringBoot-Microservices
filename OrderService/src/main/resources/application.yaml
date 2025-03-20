@@ -3,10 +3,20 @@ spring:
     name: ORDER-SERVICE
   data:
     mongodb:
-      uri: mongodb+srv://walunja11:LO56EsJAxpdErHEH@cluster0.tmq9eqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://admin:mwcSVXJCDZK02NYO@cluster0.19ahm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: productdb
   config:
     import: configserver:http://localhost:9296
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      productServiceCircuitBreaker:
+        failureRateThreshold: 50         # 50% failure rate triggers open state
+        minimumNumberOfCalls: 3           # Minimum 2 calls before evaluating failures
+        slidingWindowSize: 2              # Number of calls to track in the sliding window
+        waitDurationInOpenState: 5s       # Time before transitioning from OPEN to HALF-OPEN
+        permittedNumberOfCallsInHalfOpenState: 2
 
 management:
   tracing:

@@ -3,7 +3,7 @@ spring:
     name: PAYMENT-SERVICE
   data:
     mongodb:
-      uri: mongodb+srv://walunja11:LO56EsJAxpdErHEH@cluster0.tmq9eqi.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      uri: mongodb+srv://admin:mwcSVXJCDZK02NYO@cluster0.19ahm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
       database: productdb
   config:
     import: configserver:http://localhost:9296

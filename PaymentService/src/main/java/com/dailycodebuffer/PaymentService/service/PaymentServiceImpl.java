@@ -3,14 +3,14 @@ package com.dailycodebuffer.PaymentService.service;
 import com.dailycodebuffer.PaymentService.entity.TransactionDetails;
 import com.dailycodebuffer.PaymentService.model.PaymentRequest;
 import com.dailycodebuffer.PaymentService.repository.TransactionDetailsRepository;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 
 @Service
-@Log4j2
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private TransactionDetailsRepository transactionDetailsRepository;
