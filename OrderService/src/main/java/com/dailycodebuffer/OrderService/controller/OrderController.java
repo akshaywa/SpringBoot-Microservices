@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 public class OrderController {
     @Autowired
-    OrderService orderService;
+    private OrderService orderService;
 
     @PostMapping("/placeOrder")
     public ResponseEntity<String> placeOrder (@RequestBody OrderRequest orderRequest) {
