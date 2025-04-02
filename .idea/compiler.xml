@@ -14,10 +14,23 @@
         <module name="PaymentService" />
         <module name="CloudGateway" />
       </profile>
+      <profile name="Annotation profile for AuthService" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="AuthService" />
+      </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="AuthenticationService" target="17" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="AuthService" options="-parameters" />
       <module name="CloudGateway" options="-parameters" />
       <module name="ConfigServer" options="-parameters" />
       <module name="OrderService" options="-parameters" />
