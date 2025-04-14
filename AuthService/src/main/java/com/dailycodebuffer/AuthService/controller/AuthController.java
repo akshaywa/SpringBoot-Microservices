@@ -1,13 +1,15 @@
 package com.dailycodebuffer.AuthService.controller;
 
-import com.dailycodebuffer.AuthService.util.JwtUtil;
+import com.dailycodebuffer.AuthService.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
@@ -17,10 +19,10 @@ import java.util.Optional;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
-    public AuthController(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     @GetMapping("/token")
@@ -32,7 +34,7 @@ public class AuthController {
         String email = oauthUser.getAttribute("email");
         String userId = oauthUser.getAttribute("sub");
 
-        String accessToken = jwtUtil.generateAccessToken(userId, email);
+        String accessToken = authService.generateAccessToken(userId, email);
 
         return ResponseEntity.ok().body("{\"token\": \"" + accessToken + "\"}");
     }
@@ -46,14 +48,26 @@ public class AuthController {
         }
 
         String refreshToken = refreshTokenOpt.get();
-        if (!jwtUtil.isTokenValid(refreshToken)) {
+        if (!authService.isTokenValid(refreshToken)) {
             return ResponseEntity.status(403).body("{\"error\": \"Invalid refresh token\"}");
         }
 
-        String userId = (String) jwtUtil.extractClaims(refreshToken).get("userId");
-        String email = jwtUtil.extractClaims(refreshToken).getSubject();
+        String userId = (String) authService.extractClaims(refreshToken).get("userId");
+        String email = authService.extractClaims(refreshToken).getSubject();
 
-        String newAccessToken = jwtUtil.generateAccessToken(userId, email);
+        String newAccessToken = authService.generateAccessToken(userId, email);
         return ResponseEntity.ok().body("{\"token\": \"" + newAccessToken + "\"}");
     }
+
+
+    @GetMapping("/validate")
+    public ResponseEntity<String> validateToken(@RequestParam("token") String token) {
+        try {
+            authService.isTokenValid(token);
+            return new ResponseEntity<>("Token is valid", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Token is invalid", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 }

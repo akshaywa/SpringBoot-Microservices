@@ -6,6 +6,10 @@ spring:
   cloud:
     gateway:
       routes:
+        - id: AUTH-SERVICE
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/api/auth/**
         - id: ORDER-SERVICE
           uri: lb://ORDER-SERVICE
           predicates:
@@ -35,7 +39,7 @@ spring:
                 fallbackUri: forward:/fallback/payment
 
 resilience4j:
-  circuitbreaker:
+  circuit breaker:
     instances:
       orderServiceCircuitBreaker:
         failureRateThreshold: 50
@@ -60,8 +64,7 @@ resilience4j:
 
 management:
   tracing:
-    sampling:
-      probability: 1.0
+    enabled: false
 
 server:
   port: 9090

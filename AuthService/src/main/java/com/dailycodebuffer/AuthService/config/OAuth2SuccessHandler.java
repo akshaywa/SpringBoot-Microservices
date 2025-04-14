@@ -1,6 +1,6 @@
 package com.dailycodebuffer.AuthService.config;
 
-import com.dailycodebuffer.AuthService.util.JwtUtil;
+import com.dailycodebuffer.AuthService.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -14,10 +14,10 @@ import java.io.IOException;
 @Component
 public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private final JwtUtil jwtUtil;
+    private final AuthService authService;
 
-    public OAuth2SuccessHandler(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
+    public OAuth2SuccessHandler(AuthService authService) {
+        this.authService = authService;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String sub = oauthUser.getAttribute("sub"); // Google user ID
 
 
-        String refreshToken = jwtUtil.generateRefreshToken(sub, email);
+        String refreshToken = authService.generateRefreshToken(sub, email);
 
         // Store refresh token in an HTTP-only cookie
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);

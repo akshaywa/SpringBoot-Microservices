@@ -1,15 +1,14 @@
-package com.dailycodebuffer.AuthService.util;
+package com.dailycodebuffer.AuthService.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
-@Component
-public
-class JwtUtil {
+@Service
+public class AuthService {
     private static final String SECRET_KEY = "your_secret_key"; // Replace with a secure key
     private static final long ACCESS_TOKEN_EXPIRY = 1000 * 60 * 15; // 15 min
     private static final long REFRESH_TOKEN_EXPIRY = 1000 * 60 * 60 * 24 * 7; // 7 days
