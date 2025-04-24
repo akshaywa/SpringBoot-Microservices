@@ -21,8 +21,8 @@ public class AuthService {
         return createToken(userId, email, REFRESH_TOKEN_EXPIRY);
     }
 
-    private String createToken(String userId, String subject, long expirationTime) {
-        return Jwts.builder().setSubject(subject).claim("userId", userId) // Store user ID
+    private String createToken(String userId, String email, long expirationTime) {
+        return Jwts.builder().setSubject(userId).claim("email", email) // Store user ID
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();

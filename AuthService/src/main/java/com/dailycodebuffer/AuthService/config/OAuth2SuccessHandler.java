@@ -24,10 +24,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         DefaultOAuth2User oauthUser = (DefaultOAuth2User) authentication.getPrincipal();
         String email = oauthUser.getAttribute("email");
-        String sub = oauthUser.getAttribute("sub"); // Google user ID
+        String userId = oauthUser.getAttribute("sub"); // Google user ID
 
 
-        String refreshToken = authService.generateRefreshToken(sub, email);
+        String refreshToken = authService.generateRefreshToken(userId, email);
 
         // Store refresh token in an HTTP-only cookie
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
