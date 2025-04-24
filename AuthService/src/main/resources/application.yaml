@@ -1,6 +1,10 @@
 spring:
   application:
     name: AUTH-SERVICE
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:mwcSVXJCDZK02NYO@cluster0.19ahm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: userdb
   security:
     oauth2:
       client:

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -33,8 +34,9 @@ public class AuthController {
 
         String email = oauthUser.getAttribute("email");
         String userId = oauthUser.getAttribute("sub");
+        List<String> roles = authService.getUserRoles(userId, email);
 
-        String accessToken = authService.generateAccessToken(userId, email);
+        String accessToken = authService.generateAccessToken(userId, email, roles);
 
         return ResponseEntity.ok().body("{\"token\": \"" + accessToken + "\"}");
     }
@@ -54,8 +56,9 @@ public class AuthController {
 
         String userId = (String) authService.extractClaims(refreshToken).get("userId");
         String email = authService.extractClaims(refreshToken).getSubject();
+        List<String> roles = authService.getUserRoles(userId, email);
 
-        String newAccessToken = authService.generateAccessToken(userId, email);
+        String newAccessToken = authService.generateAccessToken(userId, email, roles);
         return ResponseEntity.ok().body("{\"token\": \"" + newAccessToken + "\"}");
     }
 

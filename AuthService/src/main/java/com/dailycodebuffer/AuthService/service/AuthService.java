@@ -1,44 +1,17 @@
 package com.dailycodebuffer.AuthService.service;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.util.List;
 
-@Service
-public class AuthService {
-    private static final String SECRET_KEY = "your_secret_key"; // Replace with a secure key
-    private static final long ACCESS_TOKEN_EXPIRY = 1000 * 60 * 15; // 15 min
-    private static final long REFRESH_TOKEN_EXPIRY = 1000 * 60 * 60 * 24 * 7; // 7 days
+public interface AuthService {
+    String generateAccessToken(String userId, String email, List<String> roles);
 
-    public String generateAccessToken(String userId, String email) {
-        return createToken(userId, email, ACCESS_TOKEN_EXPIRY);
-    }
+    String generateRefreshToken(String userId, String email);
 
-    public String generateRefreshToken(String userId, String email) {
-        return createToken(userId, email, REFRESH_TOKEN_EXPIRY);
-    }
+    Claims extractClaims(String token);
 
-    private String createToken(String userId, String email, long expirationTime) {
-        return Jwts.builder().setSubject(userId).claim("email", email) // Store user ID
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY).compact();
-    }
+    boolean isTokenValid(String token);
 
-    public Claims extractClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
-    }
-
-    public boolean isTokenValid(String token) {
-        try {
-            extractClaims(token);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
+    List<String> getUserRoles(String sub, String email);
 }
-
