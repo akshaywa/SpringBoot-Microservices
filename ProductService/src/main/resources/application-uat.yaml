@@ -1,0 +1,21 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb+srv://admin:mwcSVXJCDZK02NYO@cluster0.19ahm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: productdb
+  config:
+    import: configserver:http://localhost:9296
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
+
+my:
+  app:
+    name: "UatApp"
+    version: "1.0-UAT"
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.config.client: INFO

@@ -11,3 +11,8 @@ spring:
 server:
   port: 9296
 
+
+logging:
+  level:
+    root: INFO
+    org.springframework.cloud.config: INFO

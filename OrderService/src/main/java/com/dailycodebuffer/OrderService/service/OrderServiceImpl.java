@@ -9,10 +9,13 @@ import com.dailycodebuffer.OrderService.model.PaymentRequest;
 import com.dailycodebuffer.OrderService.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
@@ -36,34 +39,36 @@ public class OrderServiceImpl implements OrderService {
     public String placeOrder(OrderRequest orderRequest) {
         log.info("inside placeOrder method in OrderServiceImpl class. {}", orderRequest.toString());
 
-        productService.reduceQuantity(orderRequest.getProductId(), orderRequest.getQuantity());
-
-        log.info("inside placeOrder method in OrderServiceImpl class. PRODUCT-SERVICE called from ORDER-SERVICE");
-
         Order order = Order.builder().productId(orderRequest.getProductId()).quantity(orderRequest.getQuantity()).orderDate(Instant.now()).orderStatus("CREATED").amount(orderRequest.getAmount()).paymentMode(orderRequest.getPaymentMode()).build();
 
         order = orderRepository.save(order);
         String orderMessage = "Order ID: " + order.getId() + " has status: " + order.getOrderStatus();
         messagingTemplate.convertAndSend("/topic/order-updates", orderMessage);
 
-
-        log.info("inside placeOrder method in OrderServiceImpl class. Order saved in mongodb. {}", order);
-
         PaymentRequest paymentRequest = PaymentRequest.builder().orderId(order.getId()).paymentMode(order.getPaymentMode()).amount(order.getAmount()).build();
 
-        String orderStatus = null;
-        try {
-            paymentService.doPayment(paymentRequest);
-            log.info("inside placeOrder method in OrderServiceImpl class. Payment done successfully.");
+        CompletableFuture<String> productFuture = callProductService(orderRequest.getProductId(), orderRequest.getQuantity());
+        CompletableFuture<String> paymentFuture = callPaymentService(paymentRequest);
+
+        CompletableFuture.allOf(productFuture, paymentFuture).join();
+
+        String productResult = productFuture.join();
+        String paymentResult = paymentFuture.join();
+
+        String orderStatus;
+        if (productResult.startsWith("Product quantity reduced") && !paymentResult.startsWith("Payment failed")) {
             orderStatus = "PLACED";
             orderMessage = "Order ID: " + order.getId() + " has status: " + orderStatus;
             messagingTemplate.convertAndSend("/topic/order-updates", orderMessage);
-        } catch (Exception e) {
-            log.info("inside placeOrder method in OrderServiceImpl class. Payment failed.");
+            log.info("inside placeOrder method in OrderServiceImpl class. Payment done successfully.");
+        } else {
             if (!order.getPaymentMode().equals(PaymentMode.CASH)) {
                 orderStatus = "PAYMENT_FAILED";
                 orderMessage = "Order ID: " + order.getId() + " has status: " + orderStatus;
                 messagingTemplate.convertAndSend("/topic/order-updates", orderMessage);
+                log.info("inside placeOrder method in OrderServiceImpl class. Payment failed.");
+            } else {
+                orderStatus = "FAILED";
             }
         }
 
@@ -74,4 +79,27 @@ public class OrderServiceImpl implements OrderService {
 
         return order.getId();
     }
+
+
+    @Async
+    public CompletableFuture<String> callPaymentService(PaymentRequest paymentRequest) {
+        try {
+            ResponseEntity<String> response = paymentService.doPayment(paymentRequest);
+            return CompletableFuture.completedFuture(response.getBody());
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture("Payment failed: " + e.getMessage());
+        }
+    }
+
+
+    @Async
+    public CompletableFuture<String> callProductService(String productId, long quantity) {
+        try {
+            productService.reduceQuantity(productId, quantity);
+            return CompletableFuture.completedFuture("Product quantity reduced for " + productId);
+        } catch (Exception e) {
+            return CompletableFuture.completedFuture("Product quantity reduce failed: " + e.getMessage());
+        }
+    }
+
 }

@@ -1,19 +1,17 @@
 spring:
   application:
     name: PRODUCT-SERVICE
-  data:
-    mongodb:
-      uri: mongodb+srv://admin:mwcSVXJCDZK02NYO@cluster0.19ahm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-      database: productdb
-  config:
-    import: configserver:http://localhost:9296
-
+  profiles:
+    active: ${SPRING_PROFILE:dev}
 
 management:
   tracing:
     sampling:
       probability: 1.0
 
+
 server:
   port: 8080
+
+
 
