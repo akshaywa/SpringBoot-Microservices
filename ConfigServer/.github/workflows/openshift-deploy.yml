@@ -26,6 +26,7 @@ jobs:
       # Step 3: Build Docker image from Dockerfile and push to DockerHub
       - name: Build and Push Docker Image (uses Dockerfile)
         run: |
+          cd ConfigServer
           docker build -t walunja1/config-service:latest .  # Uses Dockerfile in root
           docker push walunja1/config-service:latest        # Push to DockerHub
 
