@@ -1,0 +1,26 @@
+apiVersion: apps/v1        # Kubernetes API version for Deployment objects
+kind: Deployment           # Type of Kubernetes resource (Deployment in this case)
+metadata:
+  name: registry-service   # Name of the Deployment
+spec:
+  replicas: 2             # Number of Pod replicas to maintain
+  selector:
+    # Label selector to identify which Pods belong to this Deployment
+    matchLabels:
+      app: registry-service # Matches Pods with label "app: registry-service"
+  template:               # Pod template that will be used to create new Pods
+    metadata:
+      labels:             # Labels that will be applied to all Pods created by this Deployment
+        app: registry-service
+    spec:
+      containers:
+        - name: registry-service  # Name of the container within the Pod
+          image: walunja1/registry-service:latest  # Container image to use
+          ports:
+            - containerPort: 8080  # Port the container listens on (informational)
+          readinessProbe:        # Health check to determine when the container is ready to receive traffic
+            httpGet:             # HTTP GET request to check health
+              path: /actuator/health  # Health check endpoint (common Spring Boot Actuator path)
+              port: 8080         # Port for the health check
+            initialDelaySeconds: 5  # Wait 5 seconds before first probe
+            periodSeconds: 10     # Check every 10 seconds after the initial delay
