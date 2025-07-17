@@ -1,0 +1,12 @@
+apiVersion: route.openshift.io/v1  # OpenShift-specific API version for Route objects
+kind: Route                       # Type of OpenShift resource (exposes a Service externally)
+metadata:
+  name: registry-service          # Name of the Route
+spec:
+  # Specifies the target Service that this Route will expose
+  to:
+    kind: Service                # Type of resource to route to (typically Service)
+    name: registry-service        # Name of the Service to expose
+  port:
+    # The port that the Route should target on the Service
+    targetPort: 80               # Must match the 'port' (not targetPort) of the Service
