@@ -23,7 +23,7 @@ WORKDIR /app
 
 # Copy the built JAR from the build stage
 # Using a wildcard (*) to avoid hardcoding the version
-COPY --from=build /build/target/product-service-*.jar app.jar
+COPY --from=build /build/target/*.jar app.jar
 
 # Expose the default Spring Boot port
 EXPOSE 8080
