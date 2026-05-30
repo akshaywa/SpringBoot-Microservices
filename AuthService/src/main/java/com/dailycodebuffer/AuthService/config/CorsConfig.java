@@ -1,6 +1,6 @@
 package com.dailycodebuffer.AuthService.config;
 
-import io.micrometer.common.lang.NonNull;
+import org.springframework.lang.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

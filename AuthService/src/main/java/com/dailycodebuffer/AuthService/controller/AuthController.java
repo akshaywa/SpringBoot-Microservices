@@ -43,7 +43,15 @@ public class AuthController {
 
     @GetMapping("/refresh-token")
     public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
-        Optional<String> refreshTokenOpt = Arrays.stream(request.getCookies()).filter(cookie -> "refreshToken".equals(cookie.getName())).map(Cookie::getValue).findFirst();
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return ResponseEntity.status(403).body("{\"error\": \"Refresh token missing\"}");
+        }
+
+        Optional<String> refreshTokenOpt = Arrays.stream(cookies)
+                .filter(cookie -> "refreshToken".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst();
 
         if (refreshTokenOpt.isEmpty()) {
             return ResponseEntity.status(403).body("{\"error\": \"Refresh token missing\"}");

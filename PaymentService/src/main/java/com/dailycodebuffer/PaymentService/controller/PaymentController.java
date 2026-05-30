@@ -3,7 +3,6 @@ package com.dailycodebuffer.PaymentService.controller;
 import com.dailycodebuffer.PaymentService.model.PaymentRequest;
 import com.dailycodebuffer.PaymentService.service.PaymentService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/payment")
 @Slf4j
 public class PaymentController {
-    @Autowired
-    private PaymentService paymentService;
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
 
     @PostMapping
     public ResponseEntity<String> doPayment(@RequestBody PaymentRequest paymentRequest) {
-        log.info("inside doPayment method in PaymentController class. {}", paymentRequest.toString());
+        log.info("Inside doPayment method in PaymentController class. Request: {}", paymentRequest);
         return new ResponseEntity<>(paymentService.doPayment(paymentRequest), HttpStatus.OK);
     }
 }

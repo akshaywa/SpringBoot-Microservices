@@ -23,10 +23,14 @@ public class CustomErrorDecoder implements ErrorDecoder {
                 response.request().headers());
 
         try{
+            if (response.body() == null) {
+                return new ProductServiceCustomException("Internal Server Error", "INTERNAL_SERVER_ERROR");
+            }
             ErrorResponse errorResponse = objectMapper.readValue(response.body().asInputStream(), ErrorResponse.class);
-            throw new ProductServiceCustomException(errorResponse.getErrorMessage(), errorResponse.getErrorCode());
+            return new ProductServiceCustomException(errorResponse.getErrorMessage(), errorResponse.getErrorCode());
         } catch (IOException e) {
-            throw new ProductServiceCustomException("Internal Server Error", "INTERNAL_SERVER_ERROR");
+            log.error("Failed to parse error response: {}", e.getMessage());
+            return new ProductServiceCustomException("Internal Server Error", "INTERNAL_SERVER_ERROR");
         }
     }
 }

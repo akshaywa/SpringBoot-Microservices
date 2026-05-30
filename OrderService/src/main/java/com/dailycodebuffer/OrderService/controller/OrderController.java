@@ -17,13 +17,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/order")
 @Slf4j
 public class OrderController {
+    private final OrderService orderService;
+
     @Autowired
-    private OrderService orderService;
+    public OrderController(OrderService orderService) {
+        this.orderService = orderService;
+    }
 
     @PostMapping("/placeOrder")
     public ResponseEntity<String> placeOrder (@RequestBody OrderRequest orderRequest) {
-        log.info("inside placeOrder method in OrderController class. {}",orderRequest.toString());
+        log.info("Received order request in OrderController: {}", orderRequest);
         String orderId = orderService.placeOrder(orderRequest);
+        log.info("Order successfully placed with ID: {}", orderId);
         return new ResponseEntity<>(orderId, HttpStatus.OK);
     }
 }

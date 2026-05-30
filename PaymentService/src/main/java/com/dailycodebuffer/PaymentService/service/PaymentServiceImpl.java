@@ -4,7 +4,6 @@ import com.dailycodebuffer.PaymentService.entity.TransactionDetails;
 import com.dailycodebuffer.PaymentService.model.PaymentRequest;
 import com.dailycodebuffer.PaymentService.repository.TransactionDetailsRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -12,12 +11,15 @@ import java.time.Instant;
 @Service
 @Slf4j
 public class PaymentServiceImpl implements PaymentService {
-    @Autowired
-    private TransactionDetailsRepository transactionDetailsRepository;
+    private final TransactionDetailsRepository transactionDetailsRepository;
+
+    public PaymentServiceImpl(TransactionDetailsRepository transactionDetailsRepository) {
+        this.transactionDetailsRepository = transactionDetailsRepository;
+    }
 
     @Override
     public String doPayment(PaymentRequest paymentRequest) {
-        log.info("inside doPayment method in PaymentServiceImpl class. {}", paymentRequest.toString());
+        log.info("Inside doPayment method in PaymentServiceImpl class. Request: {}", paymentRequest);
 
         TransactionDetails transactionDetails = TransactionDetails.builder()
                 .paymentDate(Instant.now())
@@ -29,7 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         transactionDetailsRepository.save(transactionDetails);
 
-        log.info("inside doPayment method in PaymentServiceImpl class. Transaction details saved in mongodb. {}", transactionDetails.toString());
+        log.info("Transaction details saved in MongoDB. TransactionDetails: {}", transactionDetails);
 
         return transactionDetails.getId();
     }

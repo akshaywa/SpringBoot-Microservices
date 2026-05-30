@@ -8,7 +8,6 @@ import com.dailycodebuffer.OrderService.model.PaymentMode;
 import com.dailycodebuffer.OrderService.model.PaymentRequest;
 import com.dailycodebuffer.OrderService.repository.OrderRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Async;
@@ -20,18 +19,16 @@ import java.util.concurrent.CompletableFuture;
 @Service
 @Slf4j
 public class OrderServiceImpl implements OrderService {
-    @Autowired
-    private OrderRepository orderRepository;
 
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private PaymentService paymentService;
-
+    private final OrderRepository orderRepository;
+    private final ProductService productService;
+    private final PaymentService paymentService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public OrderServiceImpl(SimpMessagingTemplate messagingTemplate) {
+    public OrderServiceImpl(OrderRepository orderRepository, ProductService productService, PaymentService paymentService, SimpMessagingTemplate messagingTemplate) {
+        this.orderRepository = orderRepository;
+        this.productService = productService;
+        this.paymentService = paymentService;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -87,6 +84,7 @@ public class OrderServiceImpl implements OrderService {
             ResponseEntity<String> response = paymentService.doPayment(paymentRequest);
             return CompletableFuture.completedFuture(response.getBody());
         } catch (Exception e) {
+            log.error("Payment service call failed: {}", e.getMessage());
             return CompletableFuture.completedFuture("Payment failed: " + e.getMessage());
         }
     }
@@ -98,6 +96,7 @@ public class OrderServiceImpl implements OrderService {
             productService.reduceQuantity(productId, quantity);
             return CompletableFuture.completedFuture("Product quantity reduced for " + productId);
         } catch (Exception e) {
+            log.error("Product service call failed: {}", e.getMessage());
             return CompletableFuture.completedFuture("Product quantity reduce failed: " + e.getMessage());
         }
     }

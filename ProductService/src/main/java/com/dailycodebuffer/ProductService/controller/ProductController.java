@@ -4,7 +4,6 @@ import com.dailycodebuffer.ProductService.model.ProductRequest;
 import com.dailycodebuffer.ProductService.model.ProductResponse;
 import com.dailycodebuffer.ProductService.service.ProductService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,35 +17,42 @@ import java.io.IOException;
 @RequestMapping("/product")
 @Slf4j
 public class ProductController {
-    @Autowired
-    private ProductService productService;
+    private final ProductService productService;
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @PostMapping
     public ResponseEntity<String> addProduct(@RequestBody ProductRequest productRequest) {
-        log.debug("inside addProduct method in ProductController class. {}", productRequest.toString());
+        log.debug("Inside addProduct method - Request: {}", productRequest);
         String productId = productService.addProduct(productRequest);
+        log.info("Product added successfully - ID: {}", productId);
         return new ResponseEntity<>(productId, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductResponse> getProductById(@PathVariable("id") String productId) {
-        log.debug("inside getProductById method in ProductController class. {}", productId);
+        log.debug("Inside getProductById method - Product ID: {}", productId);
         ProductResponse productResponse = productService.getProductById(productId);
+        log.info("Product retrieved successfully - Product: {}", productResponse);
         return new ResponseEntity<>(productResponse, HttpStatus.OK);
     }
 
     @PatchMapping("/reduceQuantity/{id}")
     public ResponseEntity<Void> reduceQuantity(@PathVariable("id") String productId, @RequestParam long quantity) {
-        log.debug("inside reduceQuantity method in ProductController class. {}", productId);
+        log.debug("Inside reduceQuantity method - Product ID: {}, Quantity: {}", productId, quantity);
         productService.reduceQuantity(productId, quantity);
+        log.info("Product quantity reduced successfully - Product ID: {}, New Quantity: {}", productId, quantity);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-        log.debug("inside uploadFile method in ProductController class. {}", file.getOriginalFilename());
+        log.debug("Inside uploadFile method - File: {}", file.getOriginalFilename());
         try {
             productService.storeFile(file);
+            log.info("File uploaded and stored successfully - File: {}", file.getOriginalFilename());
             return new ResponseEntity<>("File uploaded and stored successfully.", HttpStatus.OK);
         } catch (IOException e) {
             log.error("Error processing file: {}", e.getMessage());

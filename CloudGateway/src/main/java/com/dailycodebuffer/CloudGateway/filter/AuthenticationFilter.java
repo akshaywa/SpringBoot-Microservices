@@ -2,7 +2,6 @@ package com.dailycodebuffer.CloudGateway.filter;
 
 import com.dailycodebuffer.CloudGateway.config.RouteValidator;
 import com.dailycodebuffer.CloudGateway.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -15,11 +14,13 @@ import reactor.core.publisher.Mono;
 @Component
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
-    @Autowired
-    private RouteValidator validator;
+    private final RouteValidator validator;
+    private final JwtUtil jwtUtil;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    public AuthenticationFilter(RouteValidator validator, JwtUtil jwtUtil) {
+        this.validator = validator;
+        this.jwtUtil = jwtUtil;
+    }
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {

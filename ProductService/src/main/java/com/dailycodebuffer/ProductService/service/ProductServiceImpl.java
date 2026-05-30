@@ -10,7 +10,6 @@ import com.dailycodebuffer.ProductService.repository.UploadedFileRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaml.snakeyaml.Yaml;
@@ -23,11 +22,14 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ProductServiceImpl implements ProductService {
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
-    @Autowired
-    private UploadedFileRepository uploadedFileRepository;
+    private final UploadedFileRepository uploadedFileRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository, UploadedFileRepository uploadedFileRepository) {
+        this.productRepository = productRepository;
+        this.uploadedFileRepository = uploadedFileRepository;
+    }
 
     @Override
     public String addProduct(ProductRequest productRequest) {
@@ -82,11 +84,10 @@ public class ProductServiceImpl implements ProductService {
         document.setFilename(filename);
         document.setUploadTime(LocalDateTime.now());
 
-        assert filename != null;
-        if (filename.endsWith(".json")) {
+        if (filename != null && filename.endsWith(".json")) {
             document.setContentType("json");
             document.setContent(objectMapper.readValue(content, Map.class));
-        } else if (filename.endsWith(".yaml") || filename.endsWith(".yml")) {
+        } else if (filename != null && (filename.endsWith(".yaml") || filename.endsWith(".yml"))) {
             document.setContentType("yaml");
             Yaml yaml = new Yaml();
             Map<String, Object> parsed = yaml.load(content);
