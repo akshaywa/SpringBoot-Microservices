@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.bind.support.WebExchangeBindException;
 
 import java.time.LocalDateTime;
 
@@ -26,6 +27,12 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
         );
     }
 
+    @ExceptionHandler(WebExchangeBindException.class)
+    public ResponseEntity<ErrorResponse> handleValidation(WebExchangeBindException ex, ServerWebExchange exchange) {
+        String message = ex.getAllErrors().stream().map(e -> e.getDefaultMessage()).reduce((a, b) -> a + "; " + b).orElse("Validation failed");
+        return new ResponseEntity<>(buildError(HttpStatus.BAD_REQUEST, message, exchange), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntime(RuntimeException ex, ServerWebExchange exchange) {
         return new ResponseEntity<>(buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), exchange), HttpStatus.BAD_REQUEST);
@@ -38,11 +45,11 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
 
     @ExceptionHandler(JwtException.class)
     public ResponseEntity<ErrorResponse> handleJwt(JwtException ex, ServerWebExchange exchange) {
-        return new ResponseEntity<>(buildError(HttpStatus.UNAUTHORIZED, ex.getMessage(), exchange), HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(buildError(HttpStatus.UNAUTHORIZED, "Invalid or expired token", exchange), HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, ServerWebExchange exchange) {
-        return new ResponseEntity<>(buildError(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), exchange), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(buildError(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", exchange), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
